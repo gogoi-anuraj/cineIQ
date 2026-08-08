@@ -1,0 +1,76 @@
+
+data/raw/
+data/interim/
+data/processed/
+data/csv_files/
+# Model artifacts
+*.pkl
+*.pt
+*.pth
+*.npz
+*.safetensors
+distilbert_sentiment/
+
+mlruns/
+mlartifacts/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# Kaggle notebook outputs (if synced locally)
+/kaggle/working/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+
+# Environment / secrets
+.env
+*.env.local
+
+# Streamlit
+.streamlit/secrets.toml
+
+# Logs
+*.log
+
+# Pytest cache
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Reports (keep the markdown, ignore generated exports if any)
+reports/*.html
+reports/*.pdf

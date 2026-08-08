@@ -1,0 +1,19 @@
+
+paths:
+  raw_data: data/raw
+  interim_data: data/interim
+  processed_data: data/processed
+  week1_config: data/interim/week1_config.json
+  mlflow_tracking_uri: mlruns
+
+data_sources:
+  movielens: data/raw/ml-25m
+  tmdb: data/raw/the-movies-dataset
+  imdb_reviews: data/raw/imdb-50k
+  rt_reviews: data/raw/rotten-tomatoes-movies-and-critic-reviews-dataset
+
+content_model:
+  top_n_cast: 5
+
+rt_join:
+  year_tolerance: 1
