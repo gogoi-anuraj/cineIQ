@@ -144,7 +144,7 @@ pytest tests/
 
 ## Known limitations
 
-A full list with root-cause explanations is in the [ablation report](reports/ablation_report.md#8-known-limitations-consolidated). The short version:
+A full list with root-cause explanations is in the [ablation report](report/ablation_report.md#8-known-limitations-consolidated). The short version:
 
 * **Sentiment re-ranking coverage is uneven across users** — RT review data skews toward mainstream/contemporary titles, so users with arthouse/foreign/older-title taste see little re-ranking benefit.
 * **~40% of the movie catalog is excluded as a content-similarity source** — sparse TMDB metadata for those titles makes similarity scores unreliable; they remain eligible as candidates via other signals.
