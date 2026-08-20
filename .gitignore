@@ -71,6 +71,5 @@ Thumbs.db
 .coverage
 htmlcov/
 
-# Reports (keep the markdown, ignore generated exports if any)
-reports/*.html
-reports/*.pdf
+dashboard/dashboard_htmls/
+
