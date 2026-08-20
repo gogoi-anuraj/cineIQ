@@ -1,4 +1,4 @@
-# CINEIQ+ — Ablation Report
+# CINEIQ — Ablation Report
 
 **A multi-signal, explainable movie recommendation engine combining classical ML, deep sequence modeling, and transformer-based NLP.**
 
@@ -6,12 +6,12 @@
 
 ## 1. Summary
 
-CINEIQ+ blends three independently-trained signals — SVD collaborative filtering, TF-IDF content-based filtering, and a GRU sequential model — via a learned meta-model, then applies a sentiment-based post-hoc re-ranking pass and a cold-start routing rule. Every component is benchmarked against defined baselines, and every recommendation carries a human-readable explanation.
+CINEIQ blends three independently-trained signals — SVD collaborative filtering, TF-IDF content-based filtering, and a GRU sequential model — via a learned meta-model, then applies a sentiment-based post-hoc re-ranking pass and a cold-start routing rule. Every component is benchmarked against defined baselines, and every recommendation carries a human-readable explanation.
 
 The headline result: on validation data, the full stack (Popularity → Markov → GRU) shows a clean, monotonic improvement in next-item prediction quality. On the held-out test split, this picture becomes more nuanced — a finding investigated and explained in Section 6, not glossed over.
 
-| Component | Status | Headline metric |
-|---|---|---|
+| Component | Headline metric |
+|---|---|
 | SVD | RMSE 0.813, Precision@10 0.825 |
 | Content-based (TF-IDF) | Validated similarity search + per-user scoring |
 | GRU (sequential) | Hit Rate@10 5.14% (masked), beats Markov & Popularity |
@@ -46,7 +46,7 @@ A single global temporal cutoff was applied consistently across every component 
 
 ### 2.3 Warm-user evaluation subset
 
-A significant methodological finding from Week 1: **66–75% of validation/test users had zero train-period rating history** (single-burst raters, a known property of MovieLens 25M under a temporal split). Evaluating SVD/GRU/meta-model on the full population would have mostly measured cold-start behavior, not model quality. A **warm-user subset** (≥ N=25 train ratings) was carved out for fair, apples-to-apples model evaluation, while the full population remains the honest system-level number.
+A significant methodological finding: **66–75% of validation/test users had zero train-period rating history** (single-burst raters, a known property of MovieLens 25M under a temporal split). Evaluating SVD/GRU/meta-model on the full population would have mostly measured cold-start behavior, not model quality. A **warm-user subset** (≥ N=25 train ratings) was carved out for fair, apples-to-apples model evaluation, while the full population remains the honest system-level number.
 
 - Validation warm subset: 5,454 users, 412,348 ratings
 - Test warm subset: 3,427 users, 242,544 ratings
@@ -184,7 +184,7 @@ Testing across 4 real users revealed a systematic, reproducible pattern:
 | B | Mixed mainstream + arthouse | 4/10 | 2/10 |
 | C | Mainstream prestige (Titanic, Forrest Gump) | 7/10 | 4/10 |
 
-This directly traces back to Week 1's finding that RT review coverage concentrates in mainstream, contemporary titles (2010s: 40.4% of RT-matched movies vs. 33.0% catalog share; near-zero pre-1930). **The re-ranker's practical impact is uneven across users, driven entirely by the underlying data source's coverage bias — not a flaw in the re-ranking logic itself**, which was independently verified to work correctly on a controlled synthetic test.
+This directly traces back to the finding that RT review coverage concentrates in mainstream, contemporary titles (2010s: 40.4% of RT-matched movies vs. 33.0% catalog share; near-zero pre-1930). **The re-ranker's practical impact is uneven across users, driven entirely by the underlying data source's coverage bias — not a flaw in the re-ranking logic itself**, which was independently verified to work correctly on a controlled synthetic test.
 
 ### 5.3 Seen-item masking (dashboard implementation)
 
@@ -231,11 +231,11 @@ Combining the meta-model's coefficients (Section 3.6) with the standalone compon
 
 | Limitation | Where documented | Mitigation / status |
 |---|---|---|
-| RT review coverage skews toward mainstream/2010s titles | Week 1, Section 5.2 | Documented; sentiment re-ranking is consequently uneven across users |
-| ~40% of catalog excluded as content-similarity source | Week 2, Section 3.2 | `min_content_tokens=6` floor, tested against known false-positive cases |
-| Sentiment classifier domain shift (IMDB → RT) | Week 3, Section 3.5 | Spot-checked against RT's own labels (82.4%), used as a soft re-ranking signal only |
-| GRU run-to-run variance before seeding | Week 2, Section 3.3 | Global seed added; range reported instead of a single point estimate |
-| Full pipeline underperforms popularity on strict full-catalog Hit Rate@10 | Week 4, Section 6.2 | Root-caused via targeted diagnostic; future work identified |
+| RT review coverage skews toward mainstream/2010s titles | Section 5.2 | Documented; sentiment re-ranking is consequently uneven across users |
+| ~40% of catalog excluded as content-similarity source | Section 3.2 | `min_content_tokens=6` floor, tested against known false-positive cases |
+| Sentiment classifier domain shift (IMDB → RT) | Section 3.5 | Spot-checked against RT's own labels (82.4%), used as a soft re-ranking signal only |
+| GRU run-to-run variance before seeding | Section 3.3 | Global seed added; range reported instead of a single point estimate |
+| Full pipeline underperforms popularity on strict full-catalog Hit Rate@10 | Section 6.2 | Root-caused via targeted diagnostic; future work identified |
 | MLflow not wired up (results are plain JSON) | Project-wide | Scoped out under time constraints; noted as a gap against the original spec |
 
 ---
@@ -248,4 +248,4 @@ Python, scikit-learn, `Surprise` (SVD), PyTorch (GRU), HuggingFace `transformers
 
 ## 10. Conclusion
 
-CINEIQ+ demonstrates a complete, evaluated recommendation pipeline spanning classical ML, deep sequential modeling, and transformer-based NLP, integrated via a learned ensemble with required cold-start handling and a signal-appropriate explainability layer. Beyond the individual component results, the project's real methodological contribution is a consistent pattern of **catching and explaining problems with evidence rather than assuming success from a single metric** — the GRU's hidden overfitting (caught via validation loss, not Hit Rate@10), the meta-model explanation's scale-mismatch bug (caught via a synthetic test sweep), the sentiment re-ranker's coverage limitation (caught via multi-user testing, traced to an earlier finding), and the test-split popularity gap (caught and root-caused via a targeted diagnostic rather than left unexplained). Each of these findings, and the evidence behind them, is preserved above for anyone extending this work.
+CINEIQ demonstrates a complete, evaluated recommendation pipeline spanning classical ML, deep sequential modeling, and transformer-based NLP, integrated via a learned ensemble with required cold-start handling and a signal-appropriate explainability layer. Beyond the individual component results, the project's real methodological contribution is a consistent pattern of **catching and explaining problems with evidence rather than assuming success from a single metric** — the GRU's hidden overfitting (caught via validation loss, not Hit Rate@10), the meta-model explanation's scale-mismatch bug (caught via a synthetic test sweep), the sentiment re-ranker's coverage limitation (caught via multi-user testing, traced to an earlier finding), and the test-split popularity gap (caught and root-caused via a targeted diagnostic rather than left unexplained). Each of these findings, and the evidence behind them, is preserved above for anyone extending this work.
