@@ -1,16 +1,16 @@
-# CINEIQ+
+# CINEIQ
 
 An explainable, multi-signal movie recommendation engine combining classical ML, deep sequence modeling, and transformer-based NLP into one coherently evaluated ensemble system.
 
-Built as a 5-week project to demonstrate: collaborative filtering (SVD), content-based filtering (TF-IDF), deep sequential modeling (GRU4Rec-style, with an honest ablation against simpler baselines), transformer-based NLP (DistilBERT sentiment re-ranking), and applied ML rigor (temporal train/val/test evaluation, a validated ensemble, required cold-start handling, and a signal-appropriate explainability layer).
+Demonstrated: collaborative filtering (SVD), content-based filtering (TF-IDF), deep sequential modeling (GRU4Rec-style, with an honest ablation against simpler baselines), transformer-based NLP (DistilBERT sentiment re-ranking), and applied ML rigor (temporal train/val/test evaluation, a validated ensemble, required cold-start handling, and a signal-appropriate explainability layer).
 
-Full write-up of results, methodology, and findings: **[`reports/ablation_report.md`](reports/ablation_report.md)**.
+Full write-up of results, methodology, and findings: **[`report/ablation_report.md`](report/ablation_report.md)**.
 
 ---
 
 ## What it does
 
-Given a user's watch history, CINEIQ+ produces a ranked list of movie recommendations, each with a human-readable explanation of why it was recommended.
+Given a user's watch history, CINEIQ produces a ranked list of movie recommendations, each with a human-readable explanation of why it was recommended.
 
 ```
 SVD + Content + GRU scores → Meta-model (learned weights) → Ranked Top-N
@@ -45,7 +45,7 @@ See the [ablation report](reports/ablation_report.md) for the full experiment hi
 ## Project structure
 
 ```
-cineiq-plus/
+cineiq/
 ├── data/interim/          # processed datasets, trained model artifacts (gitignored)
 ├── notebooks/             # Kaggle/dev notebooks (data prep, GRU training, sentiment, meta-model)
 ├── src/
