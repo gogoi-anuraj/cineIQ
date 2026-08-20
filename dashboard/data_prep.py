@@ -115,16 +115,8 @@ def build_decade_bar_chart(decade_profile: pd.Series, title: str = "Decade Prefe
     )
     return fig
 
-def get_user_cast_affinity(user_id: int, ratings_val: pd.DataFrame, movies_master: pd.DataFrame,
-                            min_rating: float = 3.5, top_n: int = 10) -> pd.Series:
-    """
-    Counts how often specific cast members appear in a user's highly-
-    rated movies (VALIDATION-split only). Note: movies_master doesn't
-    have a separate "director" field from Week 1 -- only `cast_list`
-    (top-billed cast) was extracted. Directors would need a separate
-    TMDB credits field (crew, not cast) we didn't pull in Week 1 --
-    flagging this as a real gap, addressed below.
-    """
+
+def get_user_cast_affinity(user_id, ratings_val, movies_master, min_rating=3.5, top_n=10):
     user_ratings = ratings_val[(ratings_val["userId"] == user_id) & (ratings_val["rating"] >= min_rating)]
     user_movies = movies_master[movies_master["movieId"].isin(user_ratings["movieId"])]
 
@@ -133,7 +125,12 @@ def get_user_cast_affinity(user_id: int, ratings_val: pd.DataFrame, movies_maste
         for actor in cast_list:
             cast_counts[actor] = cast_counts.get(actor, 0) + 1
 
-    return pd.Series(cast_counts).sort_values(ascending=False).head(top_n)
+    result = pd.Series(cast_counts).sort_values(ascending=False)
+    # Break ties alphabetically for a stable, less arbitrary-looking order
+    result = result.reset_index()
+    result.columns = ["actor", "count"]
+    result = result.sort_values(["count", "actor"], ascending=[False, True]).set_index("actor")["count"]
+    return result.head(top_n)
 
 import ast
 
@@ -161,13 +158,25 @@ def add_director_to_movies_master(movies_master: pd.DataFrame, credits_path: str
     ).drop(columns=["id"])
     return out
 
+# dashboard/data_prep.py — updated get_user_director_affinity with tie-breaking
+
 def get_user_director_affinity(user_id: int, ratings_val: pd.DataFrame, movies_master_with_director: pd.DataFrame,
                                 min_rating: float = 3.5, top_n: int = 10) -> pd.Series:
+    """
+    Counts director appearances in a user's highly-rated movies
+    (VALIDATION-split only). Ties broken alphabetically for a stable,
+    non-arbitrary ordering when many directors share the same count
+    (common for users with limited rating history).
+    """
     user_ratings = ratings_val[(ratings_val["userId"] == user_id) & (ratings_val["rating"] >= min_rating)]
     user_movies = movies_master_with_director[movies_master_with_director["movieId"].isin(user_ratings["movieId"])]
 
     director_counts = user_movies["director"].dropna().value_counts()
-    return director_counts.head(top_n)
+
+    result = director_counts.reset_index()
+    result.columns = ["director", "count"]
+    result = result.sort_values(["count", "director"], ascending=[False, True]).set_index("director")["count"]
+    return result.head(top_n)
 
 
 def build_affinity_bar_chart(affinity_series: pd.Series, title: str):
@@ -294,17 +303,21 @@ if __name__ == "__main__":
     # print("\nsaved dashboard_test_director.html")
 
     test_user = 103611
-    trajectory_df = get_user_taste_trajectory(test_user, ratings_val, movies_master, n_periods=5)
-    print("trajectory data:")
-    print(trajectory_df.head(20))
+    # trajectory_df = get_user_taste_trajectory(test_user, ratings_val, movies_master, n_periods=5)
+    # print("trajectory data:")
+    # print(trajectory_df.head(20))
 
-    fig = build_trajectory_chart(trajectory_df, top_n_genres=5, title=f"Taste Trajectory — User {test_user}")
-    fig.write_html("dashboard_test_trajectory.html")
-    print("\nsaved dashboard_test_trajectory.html")
+    # fig = build_trajectory_chart(trajectory_df, top_n_genres=5, title=f"Taste Trajectory — User {test_user}")
+    # fig.write_html("dashboard_test_trajectory.html")
+    # print("\nsaved dashboard_test_trajectory.html")
 
-    # Quick check: are periods actually balanced, and do genres show real movement across periods?
-    print("ratings per period:")
-    print(trajectory_df.groupby("period")["count"].sum())
+    # # Quick check: are periods actually balanced, and do genres show real movement across periods?
+    # print("ratings per period:")
+    # print(trajectory_df.groupby("period")["count"].sum())
 
-    print("\nDrama trend across periods (as an example):")
-    print(trajectory_df[trajectory_df["genre"] == "Drama"].sort_values("period"))
+    # print("\nDrama trend across periods (as an example):")
+    # print(trajectory_df[trajectory_df["genre"] == "Drama"].sort_values("period"))
+
+    # Diagnostic: check the RAW affinity counts before charting, not just the chart
+    cast_affinity_raw = get_user_cast_affinity(44, ratings_val, movies_master, top_n=10)
+    print(cast_affinity_raw)
